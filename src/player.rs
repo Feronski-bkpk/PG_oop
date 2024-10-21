@@ -29,7 +29,7 @@ impl Player {
                 _ => Point::zero()
             };
             // вычисление новой позиции игрока
-            let new_position = self.position + delta;
+            let new_position = self.position + delta;                         // а стоит ли считать новое положение, если неизвестно - сможет ли игрок переместиться?
             // если перемещение возможно - выполнить
             if map.can_enter_tile(new_position) {
                 self.position = new_position
