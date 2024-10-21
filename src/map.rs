@@ -30,21 +30,20 @@ impl Map {
         }
     }
 
-    // отрисовка карты (рендер)
-    pub fn render(&self, ctx: &mut BTerm) {
-        // перебор карты
-        for y in 0..SCREEN_HEIGHT {
-            for x in 0..SCREEN_WIDTH {
-                // получение индекса вектора, соответствующего координатам плитки на карте
-                let idx = map_idx(x,y);
-                // поиск в векторе элемента с нужным индексом (t -> О(1)) и
-                // отрисовка (задание символа на терминале контекста (ctx) ) этого элемента исходя из
-                // его типа (который хранится в состоянии карты -> векторе плиток (tiles) )
+    // отрисовка карты (только видимой части карты)
+    pub fn render(&self, ctx: &mut BTerm, camera: &Camera) {
+        // рендеринг только первого консольного слоя (базовый слой)
+        ctx.set_active_console(0);
+        for y in camera.top_y..camera.bottom_y {
+            for x in camera.left_x..camera.right_x {
+                if self.in_bounds(Point::new(x,y)) {
 
-                // изменяю состояние плитки в зависимости
-                match self.tiles[idx] {
-                    TileType::Floor => ctx.set(x, y, YELLOW, BLACK, to_cp437('.')),
-                    TileType::Wall =>  ctx.set(x, y, GREEN, BLACK, to_cp437('#'))
+                    let idx = map_idx(x, y);
+                    // рендер плитки
+                    match self.tiles[idx] {
+                        TileType::Floor => ctx.set(x - camera.left_x, y - camera.top_y, WHITE, BLACK, to_cp437('.')),
+                        TileType::Wall => ctx.set(x - camera.left_x, y - camera.top_y, GRAY, BLACK, to_cp437('#'))
+                    }
                 }
             }
         }
